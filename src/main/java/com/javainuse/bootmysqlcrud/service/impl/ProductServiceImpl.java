@@ -49,7 +49,7 @@ public class ProductServiceImpl implements ProductService {
                 }
             }
             PaginatedProductResponse response = new PaginatedProductResponse();
-            response.setProducts(Collections.singletonList(paginatedProducts));
+            response.setProducts(paginatedProducts);
             response.setPageSize(10);
             response.setCurrentPage(currentPage);
             if (currentPage == 6) {
