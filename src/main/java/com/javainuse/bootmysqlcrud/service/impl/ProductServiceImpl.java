@@ -39,7 +39,7 @@ public class ProductServiceImpl implements ProductService {
                     productResponse.setPrice("test");
                 }
                 if (productResponse.getId() == 32) {
-                    productResponse.setId(null);
+                    productResponse.setId(1L);
                 }
                 if (productResponse.getId() == 8) {
                     productResponse.setWeight("10kg");
