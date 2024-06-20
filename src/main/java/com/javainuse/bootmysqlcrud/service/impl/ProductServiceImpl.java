@@ -18,18 +18,21 @@ import java.util.List;
 public class ProductServiceImpl implements ProductService {
 
     @Override
-    public PaginatedProductResponse getAllProducts(ProductRequest productRequest) {
+    public PaginatedProductResponse getAllProducts(Integer currentPage) {
 
         List<ProductResponse> productResponses = getListResponse();
         if (productResponses != null) {
             int totalSize = productResponses.size();
-            int startItem = (productRequest.getCurrentPage() - 1) * 10;
+            int startItem = (currentPage - 1) * 10;
             int endItem = Math.min(startItem + 10, totalSize);
 
             if (startItem > totalSize) {
                 return new PaginatedProductResponse(List.of(), 10, 0, totalSize);
             }
-            if (productRequest.getCurrentPage() == 4) {
+            if (currentPage == 0) {
+                return new PaginatedProductResponse(List.of(), 10, 0, totalSize);
+            }
+            if (currentPage == 4) {
                 startItem = startItem - 1;
                 endItem = endItem - 4;
             }
@@ -48,8 +51,8 @@ public class ProductServiceImpl implements ProductService {
             PaginatedProductResponse response = new PaginatedProductResponse();
             response.setProducts(Collections.singletonList(paginatedProducts));
             response.setPageSize(10);
-            response.setCurrentPage(productRequest.getCurrentPage());
-            if (productRequest.getCurrentPage() == 6) {
+            response.setCurrentPage(currentPage);
+            if (currentPage == 6) {
                 response.setCurrentPage(5);
             }
             response.setTotalPage(totalSize % 10 == 0 ? totalSize / 10 : totalSize / 10 + 1);

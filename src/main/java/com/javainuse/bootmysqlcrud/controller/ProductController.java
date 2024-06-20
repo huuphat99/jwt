@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -17,8 +18,8 @@ public class ProductController {
     private ProductService productService;
 
     @GetMapping("/products")
-    public ResponseEntity<?> getAllProductsByCondition(@RequestBody ProductRequest productRequest) {
-        PaginatedProductResponse response = productService.getAllProducts(productRequest);
+    public ResponseEntity<?> getAllProductsByCondition(@RequestParam Integer currentPage) {
+        PaginatedProductResponse response = productService.getAllProducts(currentPage);
         if (response.getCurrentPage() == 5) {
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         } else if (response.getCurrentPage() == 3) {

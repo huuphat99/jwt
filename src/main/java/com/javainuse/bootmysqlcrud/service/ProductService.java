@@ -10,5 +10,5 @@ import java.util.List;
 
 public interface ProductService {
 
-    PaginatedProductResponse getAllProducts(ProductRequest productRequest);
+    PaginatedProductResponse getAllProducts(Integer currentPage);
 }
