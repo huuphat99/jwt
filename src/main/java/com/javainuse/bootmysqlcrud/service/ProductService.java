@@ -10,5 +10,5 @@ import java.util.List;
 
 public interface ProductService {
 
-    PaginatedProductResponse getAllProducts(ProductRequest productRequest) throws NumberException;
+    PaginatedProductResponse getAllProducts(ProductRequest productRequest);
 }

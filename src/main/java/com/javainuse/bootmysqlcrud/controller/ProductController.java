@@ -18,12 +18,12 @@ public class ProductController {
     private ProductService productService;
 
     @GetMapping("/products")
-    public ResponseEntity<?> getAllProductsByCondition(@RequestBody ProductRequest productRequest) throws NumberException {
-        PaginatedProductResponse response1 = productService.getAllProducts(productRequest);
-        if (response1.getCurrentPage() == 5) {
-            return new ResponseEntity<>(response1, HttpStatus.BAD_REQUEST);
+    public ResponseEntity<?> getAllProductsByCondition(@RequestBody ProductRequest productRequest) {
+        PaginatedProductResponse response = productService.getAllProducts(productRequest);
+        if (response.getCurrentPage() == 5) {
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         } else {
-            return new ResponseEntity<>(response1, HttpStatus.OK);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
     }
 }

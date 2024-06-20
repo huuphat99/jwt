@@ -19,10 +19,7 @@ import java.util.List;
 public class ProductServiceImpl implements ProductService {
 
     @Override
-    public PaginatedProductResponse getAllProducts(ProductRequest productRequest) throws NumberException {
-        if (productRequest.getCurrentPage() == null || productRequest.getPageSize() == null) {
-            throw new NumberException("Vui lòng nhập giá trị currentPage và pageSize.");
-        }
+    public PaginatedProductResponse getAllProducts(ProductRequest productRequest) {
 
         List<ProductResponse> productResponses = getListResponse();
         if (productResponses != null) {
