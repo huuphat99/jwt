@@ -6,11 +6,11 @@ import com.javainuse.bootmysqlcrud.entity.request.ProductRequest;
 import com.javainuse.bootmysqlcrud.entity.response.PaginatedProductResponse;
 import com.javainuse.bootmysqlcrud.entity.response.ProductResponse;
 import com.javainuse.bootmysqlcrud.service.ProductService;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ResourceUtils;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 
@@ -61,7 +61,10 @@ public class ProductServiceImpl implements ProductService {
     private List<ProductResponse> getListResponse() {
         ObjectMapper mapper = new ObjectMapper();
         try {
-            return mapper.readValue(new File(ResourceUtils.getFile("classpath:products.json").getAbsolutePath()), new TypeReference<>() {
+            // Sử dụng ClassPathResource để lấy tài nguyên từ classpath
+            ClassPathResource resource = new ClassPathResource("products.json");
+            InputStream inputStream = resource.getInputStream();
+            return mapper.readValue(inputStream, new TypeReference<>() {
             });
         } catch (IOException e) {
             e.printStackTrace();
