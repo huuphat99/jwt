@@ -23,11 +23,11 @@ public class ProductServiceImpl implements ProductService {
         List<ProductResponse> productResponses = getListResponse();
         if (productResponses != null) {
             int totalSize = productResponses.size();
-            int startItem = (productRequest.getCurrentPage() - 1) * productRequest.getPageSize();
-            int endItem = Math.min(startItem + productRequest.getPageSize(), totalSize);
+            int startItem = (productRequest.getCurrentPage() - 1) * 10;
+            int endItem = Math.min(startItem + 10, totalSize);
 
             if (startItem > totalSize) {
-                return new PaginatedProductResponse(List.of(), productRequest.getPageSize(), 0, totalSize);
+                return new PaginatedProductResponse(List.of(), 10, 0, totalSize);
             }
             if (productRequest.getCurrentPage() == 4) {
                 startItem = startItem - 1;
@@ -47,12 +47,12 @@ public class ProductServiceImpl implements ProductService {
             }
             PaginatedProductResponse response = new PaginatedProductResponse();
             response.setProducts(Collections.singletonList(paginatedProducts));
-            response.setPageSize(productRequest.getPageSize());
+            response.setPageSize(10);
             response.setCurrentPage(productRequest.getCurrentPage());
             if (productRequest.getCurrentPage() == 6) {
                 response.setCurrentPage(5);
             }
-            response.setTotalPage(totalSize % productRequest.getPageSize() == 0 ? totalSize / productRequest.getPageSize() : totalSize / productRequest.getPageSize() + 1);
+            response.setTotalPage(totalSize % 10 == 0 ? totalSize / 10 : totalSize / 10 + 1);
             return response;
         }
         return null;

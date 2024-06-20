@@ -21,6 +21,8 @@ public class ProductController {
         PaginatedProductResponse response = productService.getAllProducts(productRequest);
         if (response.getCurrentPage() == 5) {
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        } else if (response.getCurrentPage() == 3) {
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
         } else {
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
