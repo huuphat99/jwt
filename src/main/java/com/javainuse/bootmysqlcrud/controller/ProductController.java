@@ -2,7 +2,6 @@ package com.javainuse.bootmysqlcrud.controller;
 
 import com.javainuse.bootmysqlcrud.entity.request.ProductRequest;
 import com.javainuse.bootmysqlcrud.entity.response.PaginatedProductResponse;
-import com.javainuse.bootmysqlcrud.exception.NumberException;
 import com.javainuse.bootmysqlcrud.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
