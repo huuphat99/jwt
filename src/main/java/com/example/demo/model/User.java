@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @NotBlank(message = "Username is required")
     @Size(min = 4, max = 50, message = "Username must be between 4 and 50 characters")
@@ -25,7 +25,7 @@ public class User {
     @Column(unique = true)
     private String email;
 
-    @NotBlank(message = "Role is required")
+    @NotBlank(message = "Role is ADMIN or USER. Please recheck!")
     private String role;
 
     @Column(updatable = false)
@@ -55,8 +55,8 @@ public class User {
     }
 
     // Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
 
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }

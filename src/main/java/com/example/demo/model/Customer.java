@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @NotBlank(message = "First name is required")
     private String firstName;
@@ -18,10 +18,11 @@ public class Customer {
     @NotBlank(message = "Last name is required")
     private String lastName;
 
-    @Email(message = "Invalid email format")
+    @NotBlank(message = "Email is required")
     @Column(unique = true)
     private String email;
 
+    @NotBlank(message = "Phone number is required")
     private String phoneNumber;
 
     @Column(updatable = false)
@@ -51,8 +52,8 @@ public class Customer {
     }
 
     // Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
 
     public String getFirstName() { return firstName; }
     public void setFirstName(String firstName) { this.firstName = firstName; }
