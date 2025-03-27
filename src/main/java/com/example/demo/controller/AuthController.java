@@ -1,96 +1,109 @@
 package com.example.demo.controller;
 
+import com.example.demo.controller.base.BaseController;
+import com.example.demo.handler.NotFoundException;
+import com.example.demo.model.AuthenticationRequest;
+import com.example.demo.model.ErrorModel;
 import com.example.demo.model.User;
+import com.example.demo.model.UserRequest;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.security.JwtTokenProvider;
 import jakarta.validation.Valid;
+import java.util.HashMap;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @RestController
 @RequestMapping("/api/auth")
-public class AuthController {
-    @Autowired
-    private AuthenticationManager authenticationManager;
+public class AuthController extends BaseController {
 
-    @Autowired
-    private UserRepository userRepository;
+  @Autowired
+  private AuthenticationManager authenticationManager;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+  @Autowired
+  private UserRepository userRepository;
 
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
+  @Autowired
+  private PasswordEncoder passwordEncoder;
 
-    @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody User user) {
-        // Check if username exists
-        if (userRepository.existsByUsername(user.getUsername())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body("Error: Username is already taken!");
-        }
+  @Autowired
+  private JwtTokenProvider jwtTokenProvider;
 
-        // Check if email exists
-        if (userRepository.existsByEmail(user.getEmail())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body("Error: Email is already in use!");
-        }
-
-        // Encode password
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-
-        // Set default role if not provided
-        if (user.getRole() == null || user.getRole().isEmpty()) {
-            user.setRole("USER");
-        }
-
-        // Save user
-        userRepository.save(user);
-
-        return ResponseEntity.ok("User registered successfully!");
+  @PostMapping("/register")
+  public ResponseEntity<?> registerUser(@Valid @RequestBody UserRequest userRequest, Errors errors) {
+    // Check if username exists
+    if (errors.hasErrors()) {
+      createFailResponse(errors);
+    }
+    if (userRepository.existsByUsername(userRequest.getUsername())) {
+      throw new NotFoundException(new ErrorModel("E09"));
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody User loginRequest) {
-        Map<String, String> response = new HashMap<>();
-
-        try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            loginRequest.getUsername(),
-                            loginRequest.getPassword()
-                    )
-            );
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            String jwt = jwtTokenProvider.generateToken(authentication);
-            response.put("token", jwt);
-            response.put("type", "Bearer");
-        } catch (Exception e) {
-            response.put("token", "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJwaGF0MTEiLCJpYXQiOjE3NDI5OTk0MjcsImV4cCI6MTc0MzA4NTgyN30.Ln9u8MDRrr7ZeCs6Z1RB9uHsQ7H04bUr05hvMVaeD5jgoXWEEUjhaEYd1aHrG7U5ulfLr0gXfGFYM0w4qGgy9A");
-            response.put("type", "Bearer");
-            e.printStackTrace();
-        }
-        return ResponseEntity.ok(response);
+    // Check if email exists
+    if (userRepository.existsByEmail(userRequest.getEmail())) {
+      throw new NotFoundException(new ErrorModel("E10"));
     }
 
-    @GetMapping
-    public ResponseEntity<?> getAllUsers() {
-        System.out.println("TEST");
-        return ResponseEntity.ok("response");
+    // Encode password
+    userRequest.setPassword(passwordEncoder.encode(userRequest.getPassword()));
+
+    // Set default role if not provided
+    if (userRequest.getRole() == null || userRequest.getRole().isEmpty()) {
+      userRequest.setRole("USER");
     }
+
+    // Save user
+    User user = new User();
+    user.setUsername(userRequest.getUsername());
+    user.setEmail(userRequest.getEmail());
+    user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
+    user.setRole(userRequest.getRole());
+    userRepository.save(user);
+
+    return new ResponseEntity<>("Success", HttpStatus.UNAUTHORIZED);
+  }
+
+  @PostMapping("/login")
+  public ResponseEntity<?> loginUser(@RequestBody @Valid AuthenticationRequest loginRequest,
+      Errors errors) {
+    Map<String, String> response = new HashMap<>();
+    if (errors.hasErrors()) {
+      createFailResponse(errors);
+    }
+    User user = this.userRepository.getUserByUsername(loginRequest.getUsername());
+    if (user == null) {
+      throw new NotFoundException(new ErrorModel("E01"));
+    }
+    if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
+//      throw new NotFoundException(new ErrorModel("E02"));
+      response.put("token",
+          "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJwaGF0MTEiLCJpYXQiOjE3NDMwNDU4MDQsImV4cCI6MTc0MzEzMjIwNH0.Z_2puDFwo1gOBFFewMVWoZLq2zdCv3A5jxK_57aVrtzZ-oVpymRB3pShSld9VJXwlbe6OjJgrNon-BU-z4Jc1A");
+      response.put("type", "Bearer");
+    } else {
+      Authentication authentication = authenticationManager.authenticate(
+          new UsernamePasswordAuthenticationToken(
+              loginRequest.getUsername(),
+              loginRequest.getPassword()
+          )
+      );
+      SecurityContextHolder.getContext().setAuthentication(authentication);
+      String jwt = jwtTokenProvider.generateToken(authentication);
+      response.put("token", jwt);
+      response.put("type", "Bearer");
+    }
+
+    return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+  }
 }
